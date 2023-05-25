@@ -222,7 +222,9 @@ export class LuckySheet extends LuckySheetBase {
                         let rembed = getXmlAttibute(xdr_blipfill.attributeList, "r:embed", null);
 
                         let imageObject = this.getBase64ByRid(rembed, drawingRelsFile);
-
+                        if (!imageObject) {
+                            return;
+                        }
 
 
                         // let aoff = xdr_xfrm.getInnerElements("a:off"), aext = xdr_xfrm.getInnerElements("a:ext");
