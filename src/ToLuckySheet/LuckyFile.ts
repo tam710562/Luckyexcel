@@ -287,9 +287,9 @@ export class LuckyFile extends LuckyFileBase {
 
             cy_n = cy_n + toRowOff - y_n;
 
-            console.log(defaultColWidth, colhidden , columnlen);
-            console.log(fromCol, this.columnWidthSet[fromCol] , fromColOff);
-            console.log(toCol, this.columnWidthSet[toCol] , toColOff, JSON.stringify(this.columnWidthSet));
+            // console.log(defaultColWidth, colhidden , columnlen);
+            // console.log(fromCol, this.columnWidthSet[fromCol] , fromColOff);
+            // console.log(toCol, this.columnWidthSet[toCol] , toColOff, JSON.stringify(this.columnWidthSet));
 
             imageObject.originWidth = cx_n;
             imageObject.originHeight = cy_n;
