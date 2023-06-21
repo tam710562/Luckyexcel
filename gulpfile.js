@@ -169,8 +169,8 @@ function bundleUMD() {
     .bundle()
     .pipe(source('luckyexcel.umd.js'))
     .pipe(buffer())
-    // .pipe(sourcemaps.init({loadMaps: true})) //The production environment does not need source map file
-    // .pipe(uglify())
+    .pipe(sourcemaps.init({loadMaps: true})) //The production environment does not need source map file
+    .pipe(uglify())
     .pipe(sourcemaps.write('./'))
     .pipe(dest("dist"));
     
