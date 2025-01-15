@@ -221,7 +221,7 @@ function combineIndexedColor(indexedColorsInner:Element[], indexedColors:Iattrib
 //clrScheme:Element[]
 export function getColor(color:Element, styles:IStyleCollections , type:string="g"){
     let attrList = color.attributeList;
-    let clrScheme = styles["clrScheme"] as Element[];
+    let clrScheme = (styles["clrScheme"] ?? []) as Element[];
     let indexedColorsInner = styles["indexedColors"] as Element[];
     let mruColorsInner = styles["mruColors"];
     let indexedColorsList = combineIndexedColor(indexedColorsInner, indexedColors);
