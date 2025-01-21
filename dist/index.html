@@ -1,134 +1,257 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>Hello World!</title>
-        <link rel='stylesheet' href='./luckysheet/plugins/css/pluginsCss.css' />
-        <link rel='stylesheet' href='./luckysheet/plugins/plugins.css' />
-        <link rel='stylesheet' href='./luckysheet/css/luckysheet.css' />
-        <link rel='stylesheet' href='./luckysheet/assets/iconfont/iconfont.css' />
-        <script src="./luckysheet/plugins/js/plugin.js"></script>
-        <script src="./luckysheet/luckysheet.umd.js"></script>
-        <script>
-            $(function () {
-                //Configuration item
-                var options = {
-                    container: 'luckysheet', //luckysheet is the container id
-                    showinfobar:false,
-                }
-                luckysheet.create(options)
-            });
-        </script>
-    </head>
-    <body>
-        <div id="lucky-mask-demo" style="position: absolute;z-index: 1000000;left: 0px;top: 0px;bottom: 0px;right: 0px; background: rgba(255, 255, 255, 0.8); text-align: center;font-size: 40px;align-items:center;justify-content: center;display: none;">Downloading</div>
-        <p style="text-align:center;"> <input style="font-size:16px;" type="file" id="Luckyexcel-demo-file" name="Luckyexcel-demo-file" change="demoHandler" /> Or Load remote xlsx file: <select style="height: 27px;top: -2px;position: relative;" id="Luckyexcel-select-demo"> <option value="">select a demo</option> <option value="https://minio.cnbabylon.com/public/luckysheet/money-manager-2.xlsx">Money Manager.xlsx</option> <option value="https://minio.cnbabylon.com/public/luckysheet/Activity%20costs%20tracker.xlsx">Activity costs tracker.xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/House%20cleaning%20checklist.xlsx">House cleaning checklist.xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/Student%20assignment%20planner.xlsx">Student assignment planner.xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/Credit%20card%20tracker.xlsx">Credit card tracker.xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/Blue%20timesheet.xlsx">Blue timesheet.xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/Student%20calendar%20%28Mon%29.xlsx">Student calendar (Mon).xlsx</option><option value="https://minio.cnbabylon.com/public/luckysheet/Blue%20mileage%20and%20expense%20report.xlsx">Blue mileage and expense report.xlsx</option> </select> <a href="javascript:void(0)" id="Luckyexcel-downlod-file">Download source xlsx file</a></p>
-        <div id="luckysheet" style="margin:0px;padding:0px;position:absolute;width:100%;left: 0px;top: 50px;bottom: 0px;outline: none;"></div>
-        <script src="luckyexcel.umd.js"></script>
-        <!-- <script type="module">
-            import l from './luckyexcel.js';
-            console.info('=====',l)
-            // window.onload = () => {
-            //     let upload = document.getElementById("file");
-            //     upload.addEventListener("change", function(evt){
-            //         var files = evt.target.files;   
-            //         importFile(files[0]);
-            //     });
-            // }
-        </script> -->
-        <script>
-            function demoHandler(){
-                let upload = document.getElementById("Luckyexcel-demo-file");
-                let selectADemo = document.getElementById("Luckyexcel-select-demo");
-                let downlodDemo = document.getElementById("Luckyexcel-downlod-file");
-                let mask = document.getElementById("lucky-mask-demo");
-                if(upload){
-                    
-                    window.onload = () => {
-                        
-                        upload.addEventListener("change", function(evt){
-                            var files = evt.target.files;
-                            if(files==null || files.length==0){
-                                alert("No files wait for import");
-                                return;
-                            }
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <script src="https://unpkg.com/@univerjs/umd/lib/univer.full.umd.js"></script>
+    <script src="https://unpkg.com/@univerjs/umd/lib/locale/vi-VN.js"></script>
+    <script src="luckyexcel.umd.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@univerjs/umd/lib/univer.css"
+    />
+  </head>
+  <body>
+    <div
+      id="lucky-mask-demo"
+      style="
+        position: absolute;
+        z-index: 1000000;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        background: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        font-size: 40px;
+        align-items: center;
+        justify-content: center;
+        display: none;
+      "
+    >
+      Downloading
+    </div>
+    <p style="text-align: center">
+      <input
+        style="font-size: 16px"
+        type="file"
+        id="Luckyexcel-demo-file"
+        name="Luckyexcel-demo-file"
+      />
+      Or Load remote xlsx file:
+      <select
+        style="height: 27px; top: -2px; position: relative"
+        id="Luckyexcel-select-demo"
+      >
+        <option value="">select a demo</option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/money-manager-2.xlsx"
+        >
+          Money Manager.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Activity%20costs%20tracker.xlsx"
+        >
+          Activity costs tracker.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/House%20cleaning%20checklist.xlsx"
+        >
+          House cleaning checklist.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Student%20assignment%20planner.xlsx"
+        >
+          Student assignment planner.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Credit%20card%20tracker.xlsx"
+        >
+          Credit card tracker.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Blue%20timesheet.xlsx"
+        >
+          Blue timesheet.xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Student%20calendar%20%28Mon%29.xlsx"
+        >
+          Student calendar (Mon).xlsx
+        </option>
+        <option
+          value="https://minio.cnbabylon.com/public/luckysheet/Blue%20mileage%20and%20expense%20report.xlsx"
+        >
+          Blue mileage and expense report.xlsx
+        </option>
+      </select>
+      <a href="javascript:void(0)" id="Luckyexcel-downlod-file"
+        >Download source xlsx file</a
+      >
+    </p>
+    <div
+      id="luckysheet"
+      style="
+        margin: 0px;
+        padding: 0px;
+        position: absolute;
+        width: 100%;
+        left: 0px;
+        top: 50px;
+        bottom: 0px;
+        outline: none;
+      "
+    ></div>
+    <script>
+      const {
+        UniverCore,
+        UniverDesign,
+        UniverEngineRender,
+        UniverEngineFormula,
+        UniverDocs,
+        UniverDocsUi,
+        UniverUi,
+        UniverSheets,
+        UniverSheetsUi,
+        UniverSheetsNumfmt,
+        UniverSheetsFormula,
+        UniverFacade,
+        UniverDrawing,
+        UniverDrawingUi,
+        UniverSheetsDrawing,
+        UniverSheetsDrawingUi,
+        UniverUMD,
+      } = window;
+      const univer = new UniverCore.Univer({
+        theme: UniverDesign.defaultTheme,
+        locale: UniverCore.LocaleType.VI_VN,
+        locales: {
+          [UniverCore.LocaleType.VI_VN]: UniverUMD['vi-VN'],
+        },
+      });
 
-                            let name = files[0].name;
-                            let suffixArr = name.split("."), suffix = suffixArr[suffixArr.length-1];
-                            if(suffix!="xlsx"){
-                                alert("Currently only supports the import of xlsx files");
-                                return;
-                            }
-                            LuckyExcel.transformExcelToLucky(files[0], function(exportJson, luckysheetfile){
-                                
-                                if(exportJson.sheets==null || exportJson.sheets.length==0){
-                                    alert("Failed to read the content of the excel file, currently does not support xls files!");
-                                    return;
-                                }
-                                window.luckysheet.destroy();
-                                
-                                window.luckysheet.create({
-                                    container: 'luckysheet', //luckysheet is the container id
-                                    showinfobar:false,
-                                    data:exportJson.sheets,
-                                    title:exportJson.info.name,
-                                    userInfo:exportJson.info.name.creator
-                                });
-                            });
-                        });
+      univer.registerPlugin(UniverEngineRender.UniverRenderEnginePlugin);
+      univer.registerPlugin(UniverEngineFormula.UniverFormulaEnginePlugin);
 
-                        selectADemo.addEventListener("change", function(evt){
-                            var obj = selectADemo;
-                            var index = obj.selectedIndex;
-                            var value = obj.options[index].value;
-                            var name = obj.options[index].innerHTML;
-                            if(value==""){
-                                return;
-                            }
-                            mask.style.display = "flex";
-                            LuckyExcel.transformExcelToLuckyByUrl(value, name, function(exportJson, luckysheetfile){
-                                
-                                if(exportJson.sheets==null || exportJson.sheets.length==0){
-                                    alert("Failed to read the content of the excel file, currently does not support xls files!");
-                                    return;
-                                }
-                                console.log(exportJson, luckysheetfile);
-                                mask.style.display = "none";
-                                window.luckysheet.destroy();
-                                
-                                window.luckysheet.create({
-                                    container: 'luckysheet', //luckysheet is the container id
-                                    showinfobar:false,
-                                    data:exportJson.sheets,
-                                    title:exportJson.info.name,
-                                    userInfo:exportJson.info.name.creator
-                                });
-                            });
-                        });
+      univer.registerPlugin(UniverUi.UniverUIPlugin, {
+        container: 'luckysheet',
+      });
 
-                        downlodDemo.addEventListener("click", function(evt){
-                            var obj = selectADemo;
-                            var index = obj.selectedIndex;
-                            var value = obj.options[index].value;
+      univer.registerPlugin(UniverDocs.UniverDocsPlugin, {
+        hasScroll: false,
+      });
+      univer.registerPlugin(UniverDocsUi.UniverDocsUIPlugin);
 
-                            if(value.length==0){
-                                alert("Please select a demo file");
-                                return;
-                            }
+      univer.registerPlugin(UniverSheets.UniverSheetsPlugin);
+      univer.registerPlugin(UniverSheetsUi.UniverSheetsUIPlugin);
+      univer.registerPlugin(UniverSheetsNumfmt.UniverSheetsNumfmtPlugin);
+      univer.registerPlugin(UniverSheetsFormula.UniverSheetsFormulaPlugin);
+      univer.registerPlugin(UniverDrawing.UniverDrawingPlugin);
+      univer.registerPlugin(UniverDrawingUi.UniverDrawingUIPlugin);
+      univer.registerPlugin(UniverSheetsDrawing.UniverSheetsDrawingPlugin);
+      univer.registerPlugin(UniverSheetsDrawingUi.UniverSheetsDrawingUIPlugin);
 
-                            var elemIF = document.getElementById("Lucky-download-frame");
-                            if(elemIF==null){
-                                elemIF = document.createElement("iframe");
-                                elemIF.style.display = "none";
-                                elemIF.id = "Lucky-download-frame";
-                                document.body.appendChild(elemIF);
-                            }
-                            elemIF.src = value;
-                        });
-                    }
-                }
+      univer.createUnit(UniverCore.UniverInstanceType.UNIVER_SHEET, {});
+
+      const univerAPI = UniverFacade.FUniver.newAPI(univer);
+
+      const upload = document.getElementById('Luckyexcel-demo-file');
+      const selectADemo = document.getElementById('Luckyexcel-select-demo');
+      const downlodDemo = document.getElementById('Luckyexcel-downlod-file');
+      const mask = document.getElementById('lucky-mask-demo');
+      if (upload) {
+        upload.addEventListener('change', (evt) => {
+          const files = evt.target.files;
+          if (files == null || files.length == 0) {
+            alert('No files wait for import');
+            return;
+          }
+
+          const name = files[0].name;
+          const suffixArr = name.split('.');
+          const suffix = suffixArr[suffixArr.length - 1];
+          if (suffix != 'xlsx') {
+            alert('Currently only supports the import of xlsx files');
+            return;
+          }
+          LuckyExcel.transformExcelToUniver(files[0], (exportJson) => {
+            if (exportJson.sheets == null || exportJson.sheets.length == 0) {
+              alert(
+                'Failed to read the content of the excel file, currently does not support xls files!'
+              );
+              return;
             }
-            demoHandler();
-        </script>
-    </body>
+
+            const activeWorkbook = univerAPI.getActiveWorkbook();
+            const unitId = activeWorkbook.getId();
+            if (unitId) {
+              univerAPI.disposeUnit(unitId);
+            }
+
+            univer.createUnit(
+              UniverCore.UniverInstanceType.UNIVER_SHEET,
+              exportJson || {}
+            );
+          });
+        });
+
+        selectADemo.addEventListener('change', async (evt) => {
+          const obj = selectADemo;
+          const index = obj.selectedIndex;
+          const value = obj.options[index].value;
+          const name = obj.options[index].innerText.trim();
+          if (value == '') {
+            return;
+          }
+          mask.style.display = 'flex';
+
+          const response = await fetch(value);
+          const blob = await response.blob();
+          const file = new File([blob], name);
+
+          LuckyExcel.transformExcelToUniver(file, (exportJson) => {
+            if (exportJson.sheets == null || exportJson.sheets.length == 0) {
+              alert(
+                'Failed to read the content of the excel file, currently does not support xls files!'
+              );
+              return;
+            }
+            console.log(exportJson);
+            mask.style.display = 'none';
+
+            const activeWorkbook = univerAPI.getActiveWorkbook();
+            const unitId = activeWorkbook.getId();
+            if (unitId) {
+              univerAPI.disposeUnit(unitId);
+            }
+
+            univer.createUnit(
+              UniverCore.UniverInstanceType.UNIVER_SHEET,
+              exportJson || {}
+            );
+          });
+        });
+
+        downlodDemo.addEventListener('click', function (evt) {
+          const obj = selectADemo;
+          const index = obj.selectedIndex;
+          const value = obj.options[index].value;
+
+          if (value.length == 0) {
+            alert('Please select a demo file');
+            return;
+          }
+
+          let elemIF = document.getElementById('Lucky-download-frame');
+          if (elemIF == null) {
+            elemIF = document.createElement('iframe');
+            elemIF.style.display = 'none';
+            elemIF.id = 'Lucky-download-frame';
+            document.body.appendChild(elemIF);
+          }
+          elemIF.src = value;
+        });
+      }
+    </script>
+  </body>
 </html>
