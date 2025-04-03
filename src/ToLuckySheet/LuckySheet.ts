@@ -22,6 +22,7 @@ export class LuckySheet extends LuckySheetBase {
     private mergeCells:Element[]
     private calcChainEles:Element[]
     private sheetList:IattributeList
+    private cellImages: Element[]
 
     private imageList:ImageList
 
@@ -40,6 +41,7 @@ export class LuckySheet extends LuckySheetBase {
         this.sheetList = allFileOption.sheetList;
         this.imageList = allFileOption.imageList;
         this.hide = allFileOption.hide;
+        this.cellImages = allFileOption.cellImages;
 
         //Output
         this.name = sheetName;
@@ -214,7 +216,7 @@ export class LuckySheet extends LuckySheetBase {
             this.conditionalFormatting = ruleList.map((d: any ) => new LuckyCondition(d, this.readXml, this.styles));
             // console.log(ruleList, allFileOption, this.conditionalFormatting)
         }
-        console.log(allFileOption)
+        // console.log(allFileOption)
         const filter = new LuckFilter(this.readXml, this.sheetFile)
         if (filter.ref) this.filter = filter;
       
@@ -252,7 +254,8 @@ export class LuckySheet extends LuckySheetBase {
         let drawingFile = allFileOption.drawingFile, drawingRelsFile = allFileOption.drawingRelsFile;
         if(drawingFile!=null && drawingRelsFile!=null){
             let twoCellAnchors = this.readXml.getElementsByTagName("xdr:twoCellAnchor", drawingFile);
-
+            let oneCellAnchors = this.readXml.getElementsByTagName("xdr:oneCellAnchor", drawingFile);
+            twoCellAnchors=[...twoCellAnchors,...oneCellAnchors];
             if(twoCellAnchors!=null && twoCellAnchors.length>0){
                 for(let i=0;i<twoCellAnchors.length;i++){
                     let twoCellAnchor = twoCellAnchors[i];
@@ -262,8 +265,12 @@ export class LuckySheet extends LuckySheetBase {
 
                     let xdr_blipfills = twoCellAnchor.getInnerElements("a:blip");
                     if(xdrFroms!=null && xdr_blipfills!=null && xdrFroms.length>0 && xdr_blipfills.length>0){
-                        let xdrFrom = xdrFroms[0], xdrTo = xdrTos[0],xdr_blipfill = xdr_blipfills[0];
-                        
+                        let xdrFrom = xdrFroms[0], xdrTo, xdrExt,xdr_blipfill = xdr_blipfills[0];
+                        if(xdrTos){
+                            xdrTo = xdrTos[0];
+                        }else{
+                            xdrExt = twoCellAnchor.getInnerElements("xdr:ext")[0]
+                        }
                         let rembed = getXmlAttibute(xdr_blipfill.attributeList, "r:embed", null);
 
                         let imageObject: any = this.getBase64ByRid(rembed, drawingRelsFile);
@@ -295,12 +302,19 @@ export class LuckySheet extends LuckySheetBase {
                         imageObject.fromColOff = getPxByEMUs(this.getXdrValue(xdrFrom.getInnerElements("xdr:colOff")));
                         imageObject.fromRow= this.getXdrValue(xdrFrom.getInnerElements("xdr:row"));
                         imageObject.fromRowOff = getPxByEMUs(this.getXdrValue(xdrFrom.getInnerElements("xdr:rowOff")));
-
-                        imageObject.toCol = this.getXdrValue(xdrTo.getInnerElements("xdr:col"));
-                        imageObject.toColOff = getPxByEMUs(this.getXdrValue(xdrTo.getInnerElements("xdr:colOff")));
-                        imageObject.toRow = this.getXdrValue(xdrTo.getInnerElements("xdr:row"));
-                        imageObject.toRowOff = getPxByEMUs(this.getXdrValue(xdrTo.getInnerElements("xdr:rowOff")));
-
+                        if(xdrTo){
+                            imageObject.toCol = this.getXdrValue(xdrTo.getInnerElements("xdr:col"));
+                            imageObject.toColOff = getPxByEMUs(this.getXdrValue(xdrTo.getInnerElements("xdr:colOff")));
+                            imageObject.toRow = this.getXdrValue(xdrTo.getInnerElements("xdr:row"));
+                            imageObject.toRowOff = getPxByEMUs(this.getXdrValue(xdrTo.getInnerElements("xdr:rowOff")));
+                        }else{
+                            let a = xdrExt.attributeList
+                            cx_n = getPxByEMUs(parseInt(a.cx)),cy_n = getPxByEMUs(parseInt(a.cy));
+                            imageObject.toCol = imageObject.fromCol;
+                            imageObject.toColOff = Number(imageObject.fromColOff)+cx_n;
+                            imageObject.toRow = imageObject.fromRow;
+                            imageObject.toRowOff = Number(imageObject.fromRowOff)+cy_n;
+                        }
                         imageObject.originWidth = cx_n;
                         imageObject.originHeight = cy_n;
                         
@@ -486,7 +500,18 @@ export class LuckySheet extends LuckySheetBase {
                 let cells = row.getInnerElements("c");
                 for(let key in cells){
                     let cell = cells[key];
-                    let cellValue = new LuckySheetCelldata(cell, this.styles, this.sharedStrings, this.mergeCells,this.sheetFile, this.readXml);
+                    const cellSize = this.getCellSize(cell);
+                    let cellValue = new LuckySheetCelldata(
+                        cell, 
+                        cellSize,
+                        this.styles, 
+                        this.sharedStrings, 
+                        this.mergeCells,
+                        this.sheetFile, 
+                        this.cellImages, 
+                        this.imageList, 
+                        this.readXml
+                    );
                     if(cellValue._borderObject!=null){
                         if(this.config.borderInfo==null){
                             this.config.borderInfo = [];
@@ -812,4 +837,19 @@ export class LuckySheet extends LuckySheetBase {
 
     //     return ret;
     // }
+    private getCellSize = (cell: Element) => {
+        let attrList = cell.attributeList;
+        let r = attrList.r, s = attrList.s, t = attrList.t;
+        let range = getcellrange(r);
+
+        const row = range.row[0];
+        const col = range.column[0];
+
+        const width = this.config.columnlen[col] || this.defaultColWidth;
+        const height = this.config.rowlen[row] || this.defaultRowHeight;
+        return {
+            width,
+            height
+        }
+    }
 }
