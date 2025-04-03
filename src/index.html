@@ -1,14 +1,55 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8" />
-    <title>Hello World!</title>
-    <script src="https://unpkg.com/@univerjs/umd/lib/univer.full.umd.js"></script>
-    <script src="https://unpkg.com/@univerjs/umd/lib/locale/vi-VN.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/rxjs/dist/bundles/rxjs.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/presets/lib/umd/index.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-core/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-core/lib/umd/locales/vi-VN.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-drawing/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-drawing/lib/umd/locales/vi-VN.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-hyper-link/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-hyper-link/lib/umd/locales/vi-VN.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-conditional-formatting/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-conditional-formatting/lib/umd/locales/vi-VN.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-filter/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-filter/lib/umd/locales/vi-VN.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-thread-comment/lib/umd/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-thread-comment/lib/umd/locales/vi-VN.js"></script>
+
     <script src="luckyexcel.umd.js"></script>
+
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@univerjs/umd/lib/univer.css"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-core/lib/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-drawing/lib/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-hyper-link/lib/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-conditional-formatting/lib/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-filter/lib/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@univerjs/preset-sheets-thread-comment/lib/index.css"
     />
   </head>
   <body>
@@ -103,57 +144,228 @@
       "
     ></div>
     <script>
+      const { createUniver } = UniverPresets;
       const {
-        UniverCore,
-        UniverDesign,
-        UniverEngineRender,
-        UniverEngineFormula,
-        UniverDocs,
-        UniverDocsUi,
-        UniverUi,
-        UniverSheets,
-        UniverSheetsUi,
-        UniverSheetsNumfmt,
-        UniverSheetsFormula,
-        UniverFacade,
-        UniverDrawing,
-        UniverDrawingUi,
-        UniverSheetsDrawing,
-        UniverSheetsDrawingUi,
-        UniverUMD,
-      } = window;
-      const univer = new UniverCore.Univer({
-        theme: UniverDesign.defaultTheme,
-        locale: UniverCore.LocaleType.VI_VN,
-        locales: {
-          [UniverCore.LocaleType.VI_VN]: UniverUMD['vi-VN'],
+        LocaleType,
+        merge,
+        Disposable,
+        setDependencies,
+        ICommandService,
+        IConfigService,
+        CommandType,
+        Plugin,
+        UniverInstanceType,
+        Injector,
+      } = UniverCore;
+      const {
+        IMenuManagerService,
+        ComponentManager,
+        IShortcutService,
+        MetaKeys,
+        KeyCode,
+        MenuItemType,
+        RibbonStartGroup,
+      } = UniverUi;
+      const { defaultTheme } = UniverDesign;
+      const { UniverSheetsCorePreset } = UniverPresetSheetsCore;
+      const { UniverSheetsDrawingPreset } = UniverPresetSheetsDrawing;
+      const { UniverSheetsHyperLinkPreset } = UniverPresetSheetsHyperLink;
+      const { UniverSheetsConditionalFormattingPreset } =
+        UniverPresetSheetsConditionalFormatting;
+      const { UniverSheetsFilterPreset } = UniverPresetSheetsFilter;
+      const { UniverSheetsThreadCommentPreset } =
+        UniverPresetSheetsThreadComment;
+
+      const CUSTOM_PLUGIN_CONFIG = 'CUSTOM_PLUGIN_CONFIG';
+
+      class CustomMenuController extends Disposable {
+        constructor(
+          _commandService,
+          _menuMangerService,
+          _componentManager,
+          _shortcutService,
+          _configService
+        ) {
+          super();
+
+          this._commandService = _commandService;
+          this._menuMangerService = _menuMangerService;
+          this._componentManager = _componentManager;
+          this._shortcutService = _shortcutService;
+          this._configService = _configService;
+
+          this._init();
+        }
+
+        _init() {
+          const config = this._configService.getConfig(CUSTOM_PLUGIN_CONFIG);
+          const { menu } = config || {};
+          menu.forEach((item, index) => {
+            if (item.operation) {
+              this.disposeWithMe(
+                this._commandService.registerCommand(item.operation)
+              ); // register command
+            }
+            if (item.shortcut) {
+              this.disposeWithMe(
+                this._shortcutService.registerShortcut(item.shortcut)
+              ); // register shortcut
+            }
+            if (item.icon) {
+              this.disposeWithMe(
+                this._componentManager.register(
+                  item.icon.name,
+                  item.icon.component
+                )
+              ); // register icon component
+            }
+
+            if (item.menu) {
+              this._menuMangerService.mergeMenu({
+                [RibbonStartGroup.HISTORY]: {
+                  [item.menu().id]: {
+                    order: -((menu.length || 0) - index) - 2,
+                    menuItemFactory: item.menu,
+                  },
+                },
+              });
+            }
+          });
+        }
+      }
+
+      setDependencies(CustomMenuController, [
+        ICommandService,
+        IMenuManagerService,
+        ComponentManager,
+        IShortcutService,
+        IConfigService,
+      ]);
+
+      const AllCustomController = [CustomMenuController];
+
+      const OperationId = 'custom-menu.operation.save';
+      const SaveButtonOperation = (config) => ({
+        id: OperationId,
+        type: CommandType.OPERATION,
+        handler: async () => {
+          config?.after?.();
+          return true;
         },
       });
 
-      univer.registerPlugin(UniverEngineRender.UniverRenderEnginePlugin);
-      univer.registerPlugin(UniverEngineFormula.UniverFormulaEnginePlugin);
+      const SaveShortcutItem = {
+        id: OperationId,
+        description: 'shortcut.save',
+        group: '1_common-edit',
+        binding: MetaKeys.CTRL_COMMAND | KeyCode.S,
+      };
 
-      univer.registerPlugin(UniverUi.UniverUIPlugin, {
-        container: 'luckysheet',
+      function CustomMenuItemSaveButtonFactory(accessor) {
+        return {
+          id: OperationId,
+          type: MenuItemType.BUTTON,
+          icon: 'SaveSingle',
+          tooltip: 'customMenu.save',
+          title: 'customMenu.save',
+        };
+      }
+
+      const FullscreenSingle = () => {
+        return React.createElement(
+          'svg',
+          {
+            xmlns: 'http://www.w3.org/2000/svg',
+            width: '1em',
+            height: '1em',
+            viewBox: '0 0 24 24',
+          },
+          React.createElement('path', {
+            fill: 'currentColor',
+            d: 'M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m.16 14a6.981 6.981 0 0 0-5.147 2.256A7.966 7.966 0 0 0 12 20a7.97 7.97 0 0 0 5.167-1.892A6.979 6.979 0 0 0 12.16 16M12 4a8 8 0 0 0-6.384 12.821A8.975 8.975 0 0 1 12.16 14a8.972 8.972 0 0 1 6.362 2.634A8 8 0 0 0 12 4m0 1a4 4 0 1 1 0 8a4 4 0 0 1 0-8m0 2a2 2 0 1 0 0 4a2 2 0 0 0 0-4',
+          })
+        );
+      };
+
+      const CustomSaveMenu = (config) => ({
+        id: OperationId,
+        operation: SaveButtonOperation(config),
+        shortcut: SaveShortcutItem,
+        menu: CustomMenuItemSaveButtonFactory,
+        icon: { name: 'SaveSingle', component: FullscreenSingle },
       });
 
-      univer.registerPlugin(UniverDocs.UniverDocsPlugin, {
-        hasScroll: false,
+      const config = {
+        menu: [
+          CustomSaveMenu({
+            after: () => {
+              const saveData = getUniverSnapshot();
+              console.log(saveData);
+            },
+          }),
+        ],
+      };
+
+      class UniverSheetsCustomMenuPlugin extends Plugin {
+        static type = UniverInstanceType.UNIVER_SHEET;
+        static pluginName = CUSTOM_PLUGIN_CONFIG;
+
+        constructor(_injector, _configService) {
+          super();
+
+          this._injector = _injector;
+          this._configService = _configService;
+
+          this._configService.setConfig(CUSTOM_PLUGIN_CONFIG, config);
+        }
+
+        onReady() {
+          AllCustomController.forEach((d) => this._injector.get(d));
+        }
+
+        onStarting() {
+          [AllCustomController].forEach((d) => this._injector.add(d));
+        }
+      }
+
+      setDependencies(UniverSheetsCustomMenuPlugin, [Injector, IConfigService]);
+
+      const { univerAPI } = createUniver({
+        locale: LocaleType.VI_VN,
+        locales: {
+          [LocaleType.VI_VN]: merge(
+            {},
+            UniverPresetSheetsCoreViVN,
+            UniverPresetSheetsDrawingViVN,
+            UniverPresetSheetsHyperLinkViVN,
+            UniverPresetSheetsConditionalFormattingViVN,
+            UniverPresetSheetsFilterViVN,
+            UniverPresetSheetsThreadCommentViVN
+          ),
+        },
+        theme: defaultTheme,
+        presets: [
+          UniverSheetsCorePreset({
+            container: 'luckysheet',
+          }),
+          UniverSheetsDrawingPreset(),
+          UniverSheetsHyperLinkPreset(),
+          UniverSheetsConditionalFormattingPreset(),
+          UniverSheetsFilterPreset(),
+          UniverSheetsThreadCommentPreset(),
+        ],
+        plugins: [UniverSheetsCustomMenuPlugin],
       });
-      univer.registerPlugin(UniverDocsUi.UniverDocsUIPlugin);
 
-      univer.registerPlugin(UniverSheets.UniverSheetsPlugin);
-      univer.registerPlugin(UniverSheetsUi.UniverSheetsUIPlugin);
-      univer.registerPlugin(UniverSheetsNumfmt.UniverSheetsNumfmtPlugin);
-      univer.registerPlugin(UniverSheetsFormula.UniverSheetsFormulaPlugin);
-      univer.registerPlugin(UniverDrawing.UniverDrawingPlugin);
-      univer.registerPlugin(UniverDrawingUi.UniverDrawingUIPlugin);
-      univer.registerPlugin(UniverSheetsDrawing.UniverSheetsDrawingPlugin);
-      univer.registerPlugin(UniverSheetsDrawingUi.UniverSheetsDrawingUIPlugin);
+      univerAPI.createUniverSheet({});
 
-      univer.createUnit(UniverCore.UniverInstanceType.UNIVER_SHEET, {});
-
-      const univerAPI = UniverFacade.FUniver.newAPI(univer);
+      const getUniverSnapshot = () => {
+        const activeWorkbook = univerAPI?.getActiveWorkbook();
+        if (!activeWorkbook) {
+          throw new Error('Workbook is not initialized');
+        }
+        return activeWorkbook.save();
+      };
 
       const upload = document.getElementById('Luckyexcel-demo-file');
       const selectADemo = document.getElementById('Luckyexcel-select-demo');
@@ -182,16 +394,13 @@
               return;
             }
 
-            const activeWorkbook = univerAPI.getActiveWorkbook();
-            const unitId = activeWorkbook.getId();
+            const saveData = getUniverSnapshot();
+            const unitId = saveData.id;
             if (unitId) {
-              univerAPI.disposeUnit(unitId);
+              univerAPI.disposeUnit(saveData.unitId);
             }
 
-            univer.createUnit(
-              UniverCore.UniverInstanceType.UNIVER_SHEET,
-              exportJson || {}
-            );
+            univerAPI.createUniverSheet(exportJson || {});
           });
         });
 
@@ -219,16 +428,13 @@
             console.log(exportJson);
             mask.style.display = 'none';
 
-            const activeWorkbook = univerAPI.getActiveWorkbook();
-            const unitId = activeWorkbook.getId();
+            const saveData = getUniverSnapshot();
+            const unitId = saveData.id;
             if (unitId) {
-              univerAPI.disposeUnit(unitId);
+              univerAPI.disposeUnit(saveData.unitId);
             }
 
-            univer.createUnit(
-              UniverCore.UniverInstanceType.UNIVER_SHEET,
-              exportJson || {}
-            );
+            univerAPI.createUniverSheet(exportJson || {});
           });
         });
 
