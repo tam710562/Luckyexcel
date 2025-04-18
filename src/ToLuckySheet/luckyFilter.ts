@@ -45,7 +45,7 @@ export class LuckFilter implements LuckyFilterFormat {
 
         this.ref = handleRanges(autoFilter.attributeList.ref)?.[0];
 
-        const filterColumn = autoFilter.getInnerElements('filterColumn');
+        const filterColumn = autoFilter.getInnerElements('filterColumn') ?? [];
         this.filterColumns = filterColumn.map(d => {
             const filters = d.getInnerElements('filters')?.[0];
             const filter = filters.getInnerElements('filter')
