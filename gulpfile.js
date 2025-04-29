@@ -108,7 +108,7 @@ function bundle() {
     .pipe(sourcemaps.init({ loadMaps: true }))
     // .pipe(uglify()) //Development environment does not need to compress code
     .pipe(sourcemaps.write('./'))
-    .pipe(dest("dist"));
+    .pipe(dest('dist'));
 }
 
 // 生产模式，打包成ES模块和Commonjs模块
@@ -121,7 +121,7 @@ async function compile() {
       // commonjs(), // converts date-fns to ES modules
       typescript({
         tsconfigOverride: {
-          compilerOptions: { module: "ESNext" }
+          compilerOptions: { module: 'ESNext' }
         }
       }),
       // terser(), // minify, but only in production
@@ -173,70 +173,6 @@ function bundleUMD() {
     .transform('babelify', {
       presets: ['@babel/preset-env', '@babel/preset-typescript'],
       extensions: ['.ts', '.js'],
-    })
-    .bundle()
-    .pipe(source('luckyexcel.umd.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    // .pipe(uglify()) //Development environment does not need to compress code
-    .pipe(sourcemaps.write('./'))
-    .pipe(dest('dist'));
-}
-
-// 生产模式，打包成ES模块和Commonjs模块
-async function compile() {
-
-  const bundle = await rollup({
-    input: 'src/main.esm.ts',
-    plugins: [
-      // nodeResolve(), // tells Rollup how to find date-fns in node_modules
-      // commonjs(), // converts date-fns to ES modules
-      typescript({
-        tsconfigOverride: {
-          compilerOptions: { module: 'ESNext' }
-        }
-      }),
-      // terser(), // minify, but only in production
-      // babel(babelConfig)
-    ],
-  });
-
-  bundle.write({
-    file: pkg.module,
-    format: 'esm',
-    name: 'LuckyExcel',
-    inlineDynamicImports: true,
-    // sourcemap: true
-  })
-  bundle.write({
-    file: pkg.main,
-    format: 'cjs',
-    name: 'LuckyExcel',
-    inlineDynamicImports: true,
-    // sourcemap: true
-  })
-  // bundle.write({
-  //     file: pkg.browser,
-  //     format: 'umd',
-  //     name: 'LuckyExcel',
-  //     inlineDynamicImports:true,
-  //     // sourcemap: true
-  // })
-}
-
-// 生产模式，打包成UMD模块
-function bundleUMD() {
-  return browserify({
-    basedir: '.',
-    entries: ['src/main.umd.ts'],
-    cache: {},
-    packageCache: {},
-    standalone: 'LuckyExcel'
-  })
-    .plugin(tsify)
-    .transform('babelify', {
-      presets: ['@babel/preset-env', '@babel/preset-typescript'],
-      extensions: ['.ts']
     })
     .bundle()
     .pipe(source('luckyexcel.umd.js'))
