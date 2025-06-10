@@ -1,25 +1,10 @@
-import {
-  MenuItemType,
-  IShortcutItem,
-  KeyCode,
-  MetaKeys,
-  IMenuButtonItem,
-  getMenuHiddenObservable,
-} from '@univerjs/ui';
-import {
-  CommandType,
-  IAccessor,
-  ICommand,
-  UniverInstanceType,
-} from '@univerjs/core';
-import { SaveSingle } from '@univerjs/icons';
-import { ICustomMenuPulginParams, UniverMenuConfig } from '../..';
 
-const OperationId = 'custom-menu.operation.save';
-const SaveButtonOperation: (config?: ICustomMenuPulginParams) => ICommand = (
+const { SaveSingle } = UniverIcons;
+const SaveOperationId = 'custom-menu.operation.save';
+const SaveButtonOperation = (
   config
 ) => ({
-  id: OperationId,
+  id: SaveOperationId,
   type: CommandType.OPERATION,
   handler: async () => {
     config?.after?.();
@@ -27,17 +12,19 @@ const SaveButtonOperation: (config?: ICustomMenuPulginParams) => ICommand = (
   },
 });
 
-const SaveShortcutItem: IShortcutItem = {
-  id: OperationId,
+const SaveShortcutItem = {
+  id: SaveOperationId,
   description: 'shortcut.save',
   group: '1_common-edit',
   binding: MetaKeys.CTRL_COMMAND | KeyCode.S,
 };
 
-function CustomMenuItemSaveButtonFactory(): IMenuButtonItem<string> {
+function CustomMenuItemSaveButtonFactory(
+  accessor
+) {
   return {
     // Bind the command id, clicking the button will trigger this command
-    id: OperationId,
+    id: SaveOperationId,
     // The type of the menu item, in this case, it is a button
     type: MenuItemType.BUTTON,
     // The icon of the button, which needs to be registered in ComponentManager
@@ -48,15 +35,11 @@ function CustomMenuItemSaveButtonFactory(): IMenuButtonItem<string> {
     title: 'customMenu.save',
   };
 }
-
-const CustomSaveMenu: (config?: ICustomMenuPulginParams) => UniverMenuConfig = (
-  config?: ICustomMenuPulginParams
-) => ({
-  id: OperationId,
+console.log(SaveSingle)
+const CustomSaveMenu = (config) => ({
+  id: SaveOperationId,
   operation: SaveButtonOperation(config),
   shortcut: SaveShortcutItem,
   menu: CustomMenuItemSaveButtonFactory,
   icon: { name: 'SaveSingle', component: SaveSingle },
 });
-
-export default CustomSaveMenu;
