@@ -16,11 +16,14 @@
 
     <script src="https://unpkg.com/@univerjs/preset-sheets-core/lib/umd/index.js"></script>
     <script src="https://unpkg.com/@univerjs/preset-sheets-core/lib/umd/locales/zh-CN.js"></script>
+
+    <script src="https://unpkg.com/@univerjs/preset-sheets-filter/lib/umd/index.js"></script>
+    <script src="https://unpkg.com/@univerjs/preset-sheets-filter/lib/umd/locales/zh-CN.js"></script>
+
     <script src="./libs/univer-icons.umd.js"></script>
 
-    <script src="../../dist/luckyexcel.umd.js"></script>
-
     <link rel="stylesheet" href="https://unpkg.com/@univerjs/preset-sheets-core/lib/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@univerjs/preset-sheets-filter/lib/index.css" />
     <style>
         html,
         body,
@@ -35,6 +38,28 @@
 
 <body>
     <div id="app"></div>
+    <script>
+        (function loadScriptWithFallback() {
+            const primarySrc = '../../dist/luckyexcel.umd.js';
+            const backupSrc = 'luckyexcel.umd.js';
+
+            const script = document.createElement('script');
+            script.src = primarySrc;
+
+            // 加载失败时使用备用地址
+            script.onerror = function () {
+                console.warn('Primary script failed, loading fallback...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = backupSrc;
+                fallbackScript.onerror = function () {
+                    console.error('Both script sources failed to load.');
+                };
+                document.head.appendChild(fallbackScript);
+            };
+
+            document.head.appendChild(script);
+        })();
+    </script>
 
     <script src="./plugins/controllers/menu/index.js"></script>
     <script src="./plugins/controllers/menu/save.menu.js"></script>
@@ -45,7 +70,8 @@
         const { createUniver } = UniverPresets;
         const { LocaleType, merge } = UniverCore;
         const { defaultTheme } = UniverDesign;
-        const { UniverSheetsCorePreset } = UniverPresetSheetsCore
+        const { UniverSheetsCorePreset } = UniverPresetSheetsCore;
+        const { UniverSheetsFilterPreset } = UniverPresetSheetsFilter
 
         const { univerAPI, univer } = createUniver({
             locale: LocaleType.ZH_CN,
@@ -53,11 +79,13 @@
                 [LocaleType.ZH_CN]: merge(
                     {},
                     UniverPresetSheetsCoreZhCN,
+                    UniverPresetSheetsFilterZhCN
                 ),
             },
             theme: defaultTheme,
             presets: [
                 UniverSheetsCorePreset(),
+                UniverSheetsFilterPreset(),
             ],
         });
 

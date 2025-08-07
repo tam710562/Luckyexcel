@@ -6,6 +6,7 @@ import { IattributeList } from "../ICommon";
 import { LuckySheetborderInfoCellForImp, LuckySheetCelldataBase, LuckySheetCelldataValue, LuckySheetCellFormat, LuckyInlineString } from "./LuckyBase";
 import { getBackgroundByFill, getFontStyle, handleBorder } from './style'
 import { ImageList } from "./LuckyImage";
+import { replaceSpecialWrap } from "../common/utils";
 
 export class LuckySheetCelldata extends LuckySheetCelldataBase {
     _borderObject: IluckySheetborderInfoCellForImp
@@ -96,7 +97,7 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
 
         }
 
-        let familyFont = null;
+        let familyFont: string = null;
         let quotePrefix;
         if (s != null) {
             let sNum = parseInt(s);
@@ -388,10 +389,7 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
                 value = this.htmlDecode(value);
             }
 
-            if (t == ST_CellType["SharedString"]) {
-                let siIndex = parseInt(v[0].value);
-                let sharedSI = sharedStrings[siIndex];
-
+            const generateInlineString = (sharedSI: Element) =>{
                 let rFlag = sharedSI.getInnerElements("r");
                 if (rFlag == null) {
                     let tFlag = sharedSI.getInnerElements("t");
@@ -404,6 +402,9 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
                         text = escapeCharacter(text);
 
                         //isContainMultiType(text) &&
+                        if (/&#\d+;/.test(text)) {
+                            text = this.htmlDecode(text);
+                        }
                         if (familyFont == "Roman" && text.length > 0) {
                             let textArray = text.split("");
                             let preWordType: string = null, wordText = "", preWholef: string = null;
@@ -537,7 +538,7 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
                         else {
 
 
-                            text = this.replaceSpecialWrap(text);
+                            text = replaceSpecialWrap(text);
 
                             if (text.indexOf("\r\n") > -1 || text.indexOf("\n") > -1) {
                                 let InlineString = new LuckyInlineString();
@@ -597,7 +598,7 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
 
                         if (tFlag != null && tFlag.length > 0) {
                             let text = tFlag[0].value;
-                            text = this.replaceSpecialWrap(text);
+                            text = replaceSpecialWrap(text);
                             text = escapeCharacter(text);
                             InlineString.v = text;
                         }
@@ -726,9 +727,27 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
                     cellValue.ct = cellFormat;
                 }
             }
-            // to be confirmed
+            if (t == ST_CellType["SharedString"]) {
+                let siIndex = parseInt(v[0].value);
+                let sharedSI = sharedStrings[siIndex];
+                generateInlineString(sharedSI);
+                
+            }
             else if (t == ST_CellType["InlineString"] && v != null) {
-                cellValue.v = "'" + value;
+                cellValue.v = this.htmlDecode(value);
+
+                let cellFormat = cellValue.ct;
+                if (cellFormat == null) {
+                    cellFormat = new LuckySheetCellFormat();
+                }
+                cellFormat.t = "s";
+                cellValue.ct = cellFormat;
+                
+                let is = this.cell.getInnerElements("is");
+
+                if (is.length) {
+                    generateInlineString(is[0]);
+                }
             }
             else if (t == ST_CellType["String"] && value.includes('=DISPIMG')) {
                 let cellFormat = cellValue.ct;
@@ -757,11 +776,6 @@ export class LuckySheetCelldata extends LuckySheetCelldataBase {
 
         return cellValue;
 
-    }
-
-    private replaceSpecialWrap(text: string): string {
-        text = text.replace(/_x000D_/g, "").replace(/&#13;&#10;/g, "\r\n").replace(/&#13;/g, "\r").replace(/&#10;/g, "\n");
-        return text;
     }
 
     private htmlDecode(str: string): string {

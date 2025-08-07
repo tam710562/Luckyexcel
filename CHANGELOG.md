@@ -1,5 +1,26 @@
 
 
+## [1.1.6](https://github.com/zwight/Luckyexcel/compare/v1.1.6-beta.1...v1.1.6) (2025-06-11)
+
+
+### Bug Fixes
+
+* fix excel has custom filter and set column or row length when hidden ([c55b87e](https://github.com/zwight/Luckyexcel/commit/c55b87ef13ea71d4af0c3ca312d11a7e1c86330d))
+
+## [1.1.6-beta.1](https://github.com/zwight/Luckyexcel/compare/v1.1.6-beta.0...v1.1.6-beta.1) (2025-05-23)
+
+
+### Bug Fixes
+
+* [#16](https://github.com/zwight/Luckyexcel/issues/16), fix text format is unicode ([8c0b44d](https://github.com/zwight/Luckyexcel/commit/8c0b44d422da6a41ae3b8637ccc9960f08844175))
+
+## [1.1.6-beta.0](https://github.com/zwight/Luckyexcel/compare/v1.1.5...v1.1.6-beta.0) (2025-05-22)
+
+
+### Bug Fixes
+
+* [#16](https://github.com/zwight/Luckyexcel/issues/16), fix cell type is inlineString show expection ([f463720](https://github.com/zwight/Luckyexcel/commit/f46372065b7916326c71ade0cc56e1c09a07d1af))
+
 ## [1.1.5](https://github.com/zwight/Luckyexcel/compare/v1.1.4...v1.1.5) (2025-05-21)
 
 
